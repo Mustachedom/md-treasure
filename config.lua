@@ -1,6 +1,5 @@
-Config = Config or {}
+Config =  {}
 
-Config.UseTarget = GetConvar('UseTarget', 'false') == 'false' -- Use qb-target interactions (don't change this, go to your server.cfg and add `setr UseTarget true` to use this and just that from true to false or the other way around)
 
 Config.gks = true
 Config.TreasureChest = {
