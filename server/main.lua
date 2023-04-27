@@ -34,17 +34,8 @@ end)
 QBCore.Functions.CreateUseableItem('unopenedchest', function(source, item)
 	local src = source
 	local Player = QBCore.Functions.GetPlayer(src)
-	if TriggerClientEvent("md-tresure:client:giveitem", src) then
-	end
-end)
-
-RegisterNetEvent("md-treasure:server:giveitem")
-AddEventHandler("md-treasure:server:giveitem", function()
-    local src = source
-	local Player = QBCore.Functions.GetPlayer(src)
 	local randomchance = math.random(1,100)
-	
-	if 	Player.Functions.RemoveItem("unopenedchest", 1) then
+	if Player.Functions.RemoveItem("unopenedchest", 1) then 
 		if randomchance <= 2 then 
 			Player.Functions.AddItem("goldbar", 1)
 			TriggerClientEvent("inventory:client:ItemBox", source, QBCore.Shared.Items['goldbar'], "add", 8)
@@ -69,7 +60,9 @@ AddEventHandler("md-treasure:server:giveitem", function()
 			
 		end
 	end
+	
 end)
+
 
 RegisterNetEvent("md-treasure:server:getchestloc")
 AddEventHandler("md-treasure:server:getchestloc", function()
