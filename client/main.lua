@@ -91,13 +91,7 @@ AddEventHandler('onResourceStart', function(resource)
  RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
      Wait(3000)
      LoadModel('xm_prop_x17_chest_closed')
-     TriggerEvent('treasure:init')
-	 local current = "g_m_y_famca_01"
-	RequestModel(current)
-	while not HasModelLoaded(current) do
-		Wait(0)
-	end
-	
+     TriggerEvent('treasure:init')	
  end)
 
 AddEventHandler('onResourceStop', function(resourceName)
@@ -126,7 +120,12 @@ AddEventHandler("md-treasure:client:giveitem", function()
 end)
 
 -- Functions
-
+local currentGear = {
+    mask = 0,
+    tank = 0,
+    oxygen = 0,
+    enabled = false
+}
 
 local function deleteGear()
 	if currentGear.mask ~= 0 then
@@ -161,7 +160,7 @@ RegisterNetEvent('qb-diving:client:UseGear', function(bool)
             gearAnim()
             QBCore.Functions.TriggerCallback('qb-diving:server:RemoveGear', function(result, oxygen)
                 if result then
-                    QBCore.Functions.Progressbar("equip_gear", Lang:t("info.put_suit"), 5000, false, true, {}, {}, {}, {}, function() -- Done
+                    QBCore.Functions.Progressbar("equip_gear","putting on suit", 5000, false, true, {}, {}, {}, {}, function() -- Done
                         deleteGear()
                         local maskModel = `p_d_scuba_mask_s`
                         local tankModel = `p_s_scuba_tank_s`
@@ -184,15 +183,14 @@ RegisterNetEvent('qb-diving:client:UseGear', function(bool)
                         SetPedMaxTimeUnderwater(ped, 2000.00)
                         currentGear.enabled = true
                         ClearPedTasks(ped)
-                        TriggerEvent('chatMessage', "SYSTEM", "error", Lang:t("error.take_off"))
                         Citizen.CreateThread(function()
                             while currentGear.enabled do
                                 if IsPedSwimmingUnderWater(PlayerPedId()) then
                                     currentGear.oxygen = currentGear.oxygen-1
                                     if currentGear.oxygen == 60 then
-                                        QBCore.Functions.Notify(Lang:t("warning.oxygen_one_minute"), 'error')
+                                        QBCore.Functions.Notify("one minute left", 'error')
                                     elseif currentGear.oxygen == 0 then
-                                        QBCore.Functions.Notify(Lang:t("warning.oxygen_running_out"), 'error')
+                                        QBCore.Functions.Notify("its done", 'error')
                                         SetPedMaxTimeUnderwater(ped, 50.00)
                                     elseif currentGear.oxygen == -40 then
                                         deleteGear()
@@ -208,22 +206,22 @@ RegisterNetEvent('qb-diving:client:UseGear', function(bool)
                 end
             end)
         else
-            QBCore.Functions.Notify(Lang:t("error.not_standing_up"), 'error')
+            QBCore.Functions.Notify("not standing up", 'error')
         end
     else
         if currentGear.enabled then
             gearAnim()
-            QBCore.Functions.Progressbar("remove_gear", Lang:t("info.pullout_suit"), 5000, false, true, {}, {}, {}, {}, function() -- Done
+            QBCore.Functions.Progressbar("remove_gear", "taking off suit", 5000, false, true, {}, {}, {}, {}, function() -- Done
                 SetEnableScuba(ped, false)
                 SetPedMaxTimeUnderwater(ped, 50.00)
                 currentGear.enabled = false
                 TriggerServerEvent('qb-diving:server:GiveBackGear', currentGear.oxygen)
                 ClearPedTasks(ped)
                 deleteGear()
-                QBCore.Functions.Notify(Lang:t("success.took_out"))
+                QBCore.Functions.Notify("took suit off")
             end)
         else
-            QBCore.Functions.Notify(Lang:t("error.not_wearing"), 'error')
+            QBCore.Functions.Notify("No Suit", 'error')
         end
     end
 end)
@@ -239,17 +237,17 @@ CreateThread(function()
   local entity = CreatePed(0, model, Config.missionped, 180, true, false)
   FreezeEntityPosition(entity, true)
   SetEntityInvincible(entity, true)
-  exports['qb-target']:AddTargetEntity(entity, { -- The specified entity number
-    options = { -- This is your options table, in this table all the options will be specified for the target to accept
-      { -- This is the first table with options, you can make as many options inside the options table as you want
+  exports['qb-target']:AddTargetEntity(entity, { 
+    options = { 
+      { 
        
-        type = "server", -- This specifies the type of event the target has to trigger on click, this can be "client", "server", "command" or "qbcommand", this is OPTIONAL and will only work if the event is also specified
-        event = "md-treasure:server:getchestloc", -- This is the event it will trigger on click, this can be a client event, server event, command or qbcore registered command, NOTICE: Normal command can't have arguments passed through, QBCore registered ones can have arguments passed through
-        icon = 'fas fa-example', -- This is the icon that will display next to this trigger option
-        label = 'Get Info', -- This is the label of this option which you would be able to click on to trigger everything, this has to be a string
+        type = "server", 
+        event = "md-treasure:server:getchestloc", 
+        icon = 'fas fa-example', 
+        label = 'Get Info', 
       }
     },
-    distance = 2.5, -- This is the distance for you to be at for the target to turn blue, this is in GTA units and has to be a float value
+    distance = 2.5, 
   })
 end)
 
